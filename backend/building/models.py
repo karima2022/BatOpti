@@ -13,7 +13,7 @@ class Building(models.Model):
     address = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     building_type = models.CharField(max_length=20, choices=BUILDING_TYPES)
-    picture = models.ImageField(upload_to='building_photos/', blank=True, null=True)  # Champ pour la photo
+    picture = models.ImageField(upload_to='building_photos/', blank=True, null=True, default='default.jpg')
 
     def __str__(self):
         return f"{self.name} ({self.get_building_type_display()})"

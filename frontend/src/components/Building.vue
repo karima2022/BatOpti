@@ -7,7 +7,7 @@
           <p>{{ building.address }}</p>
           <p>{{ building.building_type }}</p>
           <img v-if="building.picture" :src="building.picture" alt="Photo du bâtiment" class="building-photo" />
-          
+          <img v-else src="http://127.0.0.1:8000/media/building_photos/default.jpg" alt="Photo par défaut" class="building-photo"/>
         </div>
       </div>
     </div>
