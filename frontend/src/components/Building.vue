@@ -1,35 +1,57 @@
 <template>
-    <div class="batiments-list">
-      <h1>Liste des Bâtiments</h1>
-      <div class="cards-container">
-        <div v-for="building in buildings" :key="building.id" class="card">
-          <h2>{{ building.name }}</h2>
-          <p>{{ building.address }}</p>
-          <p>{{ building.building_type }}</p>
-          <img v-if="building.picture" :src="building.picture" alt="Photo du bâtiment" class="building-photo" />
-          <img v-else src="http://127.0.0.1:8000/media/building_photos/default.jpg" alt="Photo par défaut" class="building-photo"/>
-        </div>
+  <div class="batiments-list">
+    <h1>Liste des Bâtiments</h1>
+    <div class="cards-container">
+      <div 
+        v-for="building in buildings" 
+        :key="building.id" 
+        class="card" 
+        @click="goToDetails(building.id)" 
+        style="cursor: pointer;"
+      >
+        <h2>{{ building.name }}</h2>
+        <p>{{ building.address }}</p>
+        <p>{{ building.building_type }}</p>
+        <img 
+          v-if="building.picture" 
+          :src="building.picture" 
+          alt="Photo du bâtiment" 
+          class="building-photo" 
+        />
+        <img 
+          v-else 
+          src="http://127.0.0.1:8000/media/building_photos/default.jpg" 
+          alt="Photo par défaut" 
+          class="building-photo" 
+        />
       </div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-      name: 'BuildingsList', 
-      data() {
-          return {
-              buildings: [],
-          };
-      },
-      mounted() {
-          fetch("http://127.0.0.1:8000/api/building/building/")
-              .then((response) => response.json())
-              .then((data) => {
-                  this.buildings = data;
-              });
-      },
-  };
-  </script>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'BuildingsList', 
+  data() {
+    return {
+      buildings: [],
+    };
+  },
+  methods: {
+    goToDetails(buildingId) {
+      this.$router.push(`/batiments/${buildingId}`);
+    },
+  },
+  mounted() {
+    fetch("http://127.0.0.1:8000/api/building/building/")
+      .then((response) => response.json())
+      .then((data) => {
+        this.buildings = data;
+      });
+  },
+};
+</script>
+
   
   <style scoped>
   .batiments-list {

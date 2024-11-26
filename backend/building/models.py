@@ -6,7 +6,7 @@ class Building(models.Model):
         ('admin', 'Administration'),
         ('bank', 'Banque'),
         ('theater', 'Théâtre'),
-        # Ajoute d'autres types de bâtiments ici
+        
     ]
 
     name = models.CharField(max_length=100)
@@ -15,5 +15,18 @@ class Building(models.Model):
     building_type = models.CharField(max_length=20, choices=BUILDING_TYPES)
     picture = models.ImageField(upload_to='building_photos/', blank=True, null=True, default='default.jpg')
 
+
+
+class Equipment(models.Model):
+    EQUIPMENT_TYPES = [
+        ('elevator', 'Ascenseur'),
+        ('hvac', 'Climatisation'),
+        ('fire_alarm', 'Alarme incendie'),
+    ]
+
+    name = models.CharField(max_length=255)
+    equipment_type = models.CharField(max_length=50, choices=EQUIPMENT_TYPES)
+    building = models.ForeignKey(Building, related_name='equipments', on_delete=models.CASCADE)
+    
     def __str__(self):
         return f"{self.name} ({self.get_building_type_display()})"

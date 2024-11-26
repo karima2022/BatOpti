@@ -27,8 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # App
-    path('api/building/', include('building.urls')),  # Préfixe clair pour chaque application
-    path('api/ticket/', include('ticket.urls')),
+    path('api/building/', include('building.urls')),  
     path('api/user/', include('customUser.urls')),
 
     # Auth
