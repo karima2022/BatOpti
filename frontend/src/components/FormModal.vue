@@ -1,49 +1,38 @@
 <template>
-    <div v-if="visible" class="form-modal">
-      <div class="form-container">
-        <h2>{{ title }}</h2>
-        <form @submit.prevent="handleSubmit">
-          <div v-for="(field, key) in fields" :key="key" class="form-group">
-            <label :for="key">{{ field.label }}</label>
-            <template v-if="field.type === 'text' || field.type === 'number' || field.type === 'email'">
-              <input
-                :type="field.type"
-                :id="key"
-                v-model="formData[key]"
-                :placeholder="field.placeholder"
-                class="form-control"
-                :required="field.required"
-              />
-            </template>
-            <template v-if="field.type === 'textarea'">
-              <textarea
-                :id="key"
-                v-model="formData[key]"
-                :placeholder="field.placeholder"
-                class="form-control"
-                :required="field.required"
-              ></textarea>
-            </template>
-            <template v-if="field.type === 'select'">
-              <select
-                :id="key"
-                v-model="formData[key]"
-                class="form-control"
-                :required="field.required"
-              >
-                <option disabled value="">-- {{ field.placeholder }} --</option>
-                <option v-for="option in field.options" :key="option.value" :value="option.value">
-                  {{ option.label }}
-                </option>
-              </select>
-            </template>
-          </div>
-          <button type="submit" class="form-button">Créer</button>
-          <button type="button" class="form-button cancel" @click="handleCancel">Annuler</button>
-        </form>
-      </div>
+  <div v-if="visible" class="form-modal">
+    <div class="form-container">
+      <h2>{{ title }}</h2>
+      <form @submit.prevent="handleSubmit">
+        <div v-for="(field, key) in fields" :key="key" class="form-group">
+          <label :for="key">{{ field.label }}</label>
+          <template v-if="field.type === 'text' || field.type === 'number' || field.type === 'email'">
+            <input :type="field.type" :id="key" v-model="formData[key]" :placeholder="field.placeholder"
+              class="form-control" :required="field.required" />
+          </template>
+          <template v-if="field.type === 'textarea'">
+            <textarea :id="key" v-model="formData[key]" :placeholder="field.placeholder" class="form-control"
+              :required="field.required"></textarea>
+          </template>
+          <template v-if="field.type === 'file'">
+            <input type="file" :id="key" @change="handleFileChange($event, key)" class="form-control"
+              :placeholder="field.placeholder" :required="field.required" />
+          </template>
+
+          <template v-if="field.type === 'select'">
+            <select :id="key" v-model="formData[key]" class="form-control" :required="field.required">
+              <option disabled value="">-- {{ field.placeholder }} --</option>
+              <option v-for="option in field.options" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </template>
+        </div>
+        <button type="submit" class="form-button">Créer</button>
+        <button type="button" class="form-button cancel" @click="handleCancel">Annuler</button>
+      </form>
     </div>
-  </template>
+  </div>
+</template>
 
 <script>
 export default {
@@ -71,15 +60,25 @@ export default {
     };
   },
   methods: {
+    handleFileChange(event, key) {
+      const file = event.target.files[0];
+      if (file) {
+        this.formData[key] = file; // Ajoute le fichier à formData
+      }
+    },
     handleSubmit() {
+      // Vérifiez les données avant de les envoyer
+      console.log('Formulaire soumis avec les données :', this.formData);
       this.$emit('submit', this.formData);
     },
     handleCancel() {
-      this.$emit('cancel'); 
+      this.$emit('cancel');
     },
   },
 };
 </script>
+
+
 
 <style scoped>
 .form-modal {

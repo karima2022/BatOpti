@@ -8,7 +8,7 @@ class Ticket(models.Model):
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=20, choices=[('open', 'Ouvert'), ('in_progress', 'En cours'), ('resolved', 'Résolu')])
+    status = models.CharField(max_length=20, choices=[('created', 'créé'),('open', 'Ouvert'), ('in_progress', 'En cours'), ('resolved', 'Résolu')],default='created')
     priority = models.CharField(max_length=10, choices=[('low', 'Faible'), ('medium', 'Moyenne'), ('high', 'Élevée')])
     ticket_type = models.CharField(max_length=20, choices=[('intervention', 'Intervention'), ('maintenance', 'Maintenance')])
     assigned_to = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True) 

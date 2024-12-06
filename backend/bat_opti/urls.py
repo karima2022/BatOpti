@@ -29,6 +29,7 @@ urlpatterns = [
     # App
     path('api/building/', include('building.urls')),  
     path('api/user/', include('customUser.urls')),
+      path('api/ticket/', include('ticket.urls')),
 
     # Auth
     path('api/auth/register/', RegisterView.as_view(), name='register'),

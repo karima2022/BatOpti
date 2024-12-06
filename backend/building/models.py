@@ -28,5 +28,6 @@ class Equipment(models.Model):
     equipment_type = models.CharField(max_length=50, choices=EQUIPMENT_TYPES)
     building = models.ForeignKey(Building, related_name='equipments', on_delete=models.CASCADE)
     
+    
     def __str__(self):
-        return f"{self.name} ({self.get_building_type_display()})"
+        return f"{self.name} ({self.building.get_building_type_display()})"

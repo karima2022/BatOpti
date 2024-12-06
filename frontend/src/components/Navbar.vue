@@ -1,26 +1,33 @@
 <template>
-  <div class="nav-menu">
-    <i class="fas fa-bars" v-if="isAuthenticated" @click="toggleMenu"></i>
-    <div class="nav-content" :class="showMobileMenu ? 'open-menu' : 'closed-menu'">
+  <nav class="nav-menu">
+    <!-- Icône de menu pour le mobile -->
+    <i class="fas fa-bars menu-icon" v-if="isAuthenticated" @click="toggleMenu"></i>
+
+    <!-- Contenu principal de la navigation -->
+    <div class="nav-content" :class="{ 'open-menu': showMobileMenu }">
+      <!-- Logo -->
       <div class="logo">
-        <img src="../assets/logo.png" alt="Logo">
+        <img src="../assets/logo.png" alt="Logo" />
       </div>
-      <!-- Menu pour les utilisateurs connectés -->
+
+      <!-- Navigation pour utilisateurs connectés -->
       <ul v-if="isAuthenticated" class="nav-items">
         <li><router-link to="/batiments">Bâtiments</router-link></li>
         <li><router-link to="/tickets">Tickets</router-link></li>
         <li><router-link to="/audits">Audits</router-link></li>
         <li><router-link to="/projets">Projets</router-link></li>
       </ul>
-      <button v-if="isAuthenticated" class="login-button" @click="logout">Logout</button>
 
-      <!-- Boutons pour les utilisateurs non connectés -->
+      <!-- Boutons connexion/déconnexion -->
+      <div v-if="isAuthenticated">
+        <button class="action-button" @click="logout">Logout</button>
+      </div>
       <div v-else class="auth-buttons">
-
-        <router-link to="/register" class="login-button">S'enregistrer</router-link>
+        <router-link to="/login" class="action-button">Login</router-link>
+        <router-link to="/register" class="action-button outlined">Register</router-link>
       </div>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script>
@@ -34,7 +41,7 @@ export default {
   computed: {
     // Vérifie si l'utilisateur est connecté
     isAuthenticated() {
-      return !!localStorage.getItem("access"); // Retourne true si "access" existe
+      return !!localStorage.getItem("access");
     },
   },
   methods: {
@@ -42,30 +49,34 @@ export default {
       this.showMobileMenu = !this.showMobileMenu;
     },
     logout() {
-      // Supprime les tokens pour déconnecter l'utilisateur
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-      this.$router.push("/login"); // Redirige vers la page de connexion
+      this.$router.push("/login");
     },
   },
 };
 </script>
 
+
 <style lang="scss" scoped>
 .nav-menu {
-  background-color: #333;
-  color: white;
-  position: relative;
+  background: white; /* Fond blanc */
   padding: 10px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  position: relative;
+  z-index: 10;
 }
 
 .logo img {
   width: 120px;
-  filter: brightness(1) invert(1);
+  transition: transform 0.3s ease;
+}
+
+.logo img:hover {
+  transform: scale(1.1);
 }
 
 .nav-content {
@@ -84,60 +95,81 @@ export default {
 }
 
 .nav-items li {
-  padding: 10px 0;
+  text-align: center;
 }
 
 .nav-items li a {
-  color: white;
   text-decoration: none;
-  transition: color 0.3s;
+  color: #333; /* Couleur principale */
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 8px 15px;
+  border-radius: 5px; /* Ajout d'arrondi pour les liens */
+  transition: all 0.3s ease;
 }
 
 .nav-items li a:hover {
-  color: #1e90ff;
+  color: white; /* Texte devient blanc */
+  background: #2196f3; /* Fond bleu sur survol */
+  transform: translateY(-2px); /* Animation légère */
 }
 
-.login-button {
-  background-color: #1e90ff;
-  padding: 8px 15px;
-  border-radius: 5px;
-  color: white;
+.action-button {
+  background-color: #ffcc00;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  text-decoration: none; /* Pour les liens */
+  transition: all 0.3s ease;
+  font-weight: bold;
 }
 
-.login-button:hover {
-  background-color: #145ba1;
+.action-button:hover {
+  background-color: #e6b800;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-i {
-  font-size: 1.5rem;
+
+.action-button.outlined {
+  background: none;
+  color: #4caf50;
+  border: 2px solid #4caf50;
+}
+
+.action-button.outlined:hover {
+  background: #4caf50;
+  color: white;
+}
+
+/* Icône de menu pour le mobile */
+.menu-icon {
+  font-size: 1.8rem;
+  color: #333; /* Icône devient gris foncé */
   cursor: pointer;
   display: none;
 }
 
-/* Styles pour la version mobile */
-@media screen and (max-width: 768px) {
-  .nav-menu {
-    padding-top: 10px;
-  }
-
+/* Responsive Design */
+@media (max-width: 768px) {
   .nav-content {
     flex-direction: column;
     align-items: flex-start;
-    background-color: #333;
     position: absolute;
-    top: 50px;
+    top: 60px;
     left: 0;
     width: 100%;
+    background: white; /* Fond blanc pour le menu mobile */
     transition: max-height 0.3s ease;
     overflow: hidden;
     max-height: 0;
+    z-index: 1000;
   }
 
-  .open-menu {
-    max-height: 200px; /* Ajuste la hauteur selon la taille du contenu */
+  .nav-content.open-menu {
+    max-height: 300px; /* Ajustez selon le contenu */
   }
 
   .nav-items {
@@ -147,13 +179,19 @@ i {
   }
 
   .nav-items li {
-    padding: 10px;
     width: 100%;
+    padding: 10px 0;
   }
 
-  i {
+  .menu-icon {
     display: block;
-    color: white;
+  }
+
+  .action-button {
+    margin: 10px 0;
+    width: calc(100% - 20px);
   }
 }
+
+
 </style>

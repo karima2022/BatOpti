@@ -4,7 +4,7 @@
       <div class="login-header">
 <!--        <img src="../assets/bat.webp" alt="Illustration du bâtiment" class="login-image" />-->
         <h2>Bienvenue sur BatOpti</h2>
-        <p>Connectez-vous pour gérer vos bâtiments et projets</p>
+        <p>Connectez-vous pour gérer vos bâtiments lol et projets</p>
       </div>
       <form @submit.prevent="login" class="login-form">
         <div class="form-group">
