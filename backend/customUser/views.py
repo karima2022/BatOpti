@@ -12,11 +12,15 @@ from .models import CustomUser
 from .serializers import CustomUserSerializer
 
 
+
 class UserListView(viewsets.ModelViewSet):
     permission_classes(IsAuthenticated)
-    queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
-
+    def get_queryset(self):
+        profession_type = self.request.query_params.get('profession_type')
+        if profession_type:
+            return CustomUser.objects.filter(profession_type=profession_type)
+        return CustomUser.objects.all()
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -54,3 +58,5 @@ class UserInfoView(APIView):
             "email": user.email,
             "profession_type": user.profession_type,
         })
+
+

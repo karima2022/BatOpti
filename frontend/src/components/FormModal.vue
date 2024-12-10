@@ -7,25 +7,35 @@
           <label :for="key">{{ field.label }}</label>
           <template v-if="field.type === 'text' || field.type === 'number' || field.type === 'email'">
             <input :type="field.type" :id="key" v-model="formData[key]" :placeholder="field.placeholder"
-              class="form-control" :required="field.required" />
+                   class="form-control" :required="field.required"/>
           </template>
           <template v-if="field.type === 'textarea'">
             <textarea :id="key" v-model="formData[key]" :placeholder="field.placeholder" class="form-control"
-              :required="field.required"></textarea>
+                      :required="field.required"></textarea>
           </template>
           <template v-if="field.type === 'file'">
             <input type="file" :id="key" @change="handleFileChange($event, key)" class="form-control"
-              :placeholder="field.placeholder" :required="field.required" />
+                   :placeholder="field.placeholder" :required="field.required"/>
           </template>
 
           <template v-if="field.type === 'select'">
-            <select :id="key" v-model="formData[key]" class="form-control" :required="field.required">
+            <select
+                :id="key"
+                v-model="formData[key]"
+                class="form-control"
+                :required="field.required"
+                @change="handleSelectChange(key, $event)">
               <option disabled value="">-- {{ field.placeholder }} --</option>
-              <option v-for="option in field.options" :key="option.value" :value="option.value">
+              <option
+                  v-for="option in field.options"
+                  :key="option.value"
+                  :value="option.value">
                 {{ option.label }}
               </option>
             </select>
           </template>
+
+
         </div>
         <button type="submit" class="form-button">Créer</button>
         <button type="button" class="form-button cancel" @click="handleCancel">Annuler</button>
@@ -56,18 +66,25 @@ export default {
   },
   data() {
     return {
-      formData: { ...this.initialData },
+      formData: {...this.initialData},
     };
   },
   methods: {
+    handleSelectChange(key, event) {
+      if (key === 'building') {
+        const buildingId = event.target.value;
+        this.$emit('building-changed', buildingId); // Émet l'événement vers le composant parent
+      }
+    },
+
     handleFileChange(event, key) {
       const file = event.target.files[0];
       if (file) {
-        this.formData[key] = file; // Ajoute le fichier à formData
+        this.formData[key] = file;
       }
     },
     handleSubmit() {
-      // Vérifiez les données avant de les envoyer
+
       console.log('Formulaire soumis avec les données :', this.formData);
       this.$emit('submit', this.formData);
     },
@@ -77,7 +94,6 @@ export default {
   },
 };
 </script>
-
 
 
 <style scoped>

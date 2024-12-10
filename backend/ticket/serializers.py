@@ -7,10 +7,11 @@ from .models import Ticket, CustomUser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'profession_type']
+        fields = '__all__'
 
 class TicketSerializer(serializers.ModelSerializer):
-    assigned_to = UserSerializer()
+
+    assigned_to = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), required=False, allow_null=True)
 
     class Meta:
         model = Ticket

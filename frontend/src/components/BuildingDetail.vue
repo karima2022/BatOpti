@@ -160,6 +160,13 @@ export default {
           ],
           required: true,
         },
+        equipment: {
+          label: "Équipement",
+          type: "select",
+          placeholder: "Sélectionner un équipement",
+          options: this.equipments.map(e => ({ value: e.id, label: e.name })),
+          required: false,
+        },
       };
       this.formInitialData = {};
       this.formType = 'ticket';

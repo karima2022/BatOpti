@@ -6,32 +6,32 @@
     <!-- Kanban Board -->
     <div class="kanban-board">
       <div
-        v-for="column in columns"
-        :key="column.status"
-        class="kanban-column"
-        @dragover.prevent
-        @drop="handleDrop($event, column.status)"
+          v-for="column in columns"
+          :key="column.status"
+          class="kanban-column"
+          @dragover.prevent
+          @drop="handleDrop($event, column.status)"
       >
         <h2 class="column-title">{{ column.title }}</h2>
 
         <!-- Tickets dans la colonne -->
         <div
-          v-for="ticket in filteredTickets(column.status)"
-          :key="ticket.id"
-          class="kanban-card"
-          draggable="true"
-          @dragstart="handleDragStart(ticket.id)"
+            v-for="ticket in filteredTickets(column.status)"
+            :key="ticket.id"
+            class="kanban-card"
+            draggable="true"
+            @dragstart="handleDragStart(ticket.id)"
         >
           <div class="card-header">
             <div class="building-bubble">
-                  <div class="image-container">
-          <img
-  :src="getBuildingById(ticket.building)?.picture || 'http://127.0.0.1:8000/media/default.jpg'"
-  alt="Photo du bâtiment"
-  class="building-photo"
-/>
+              <div class="image-container">
+                <img
+                    :src="getBuildingById(ticket.building)?.picture || 'http://127.0.0.1:8000/media/default.jpg'"
+                    alt="Photo du bâtiment"
+                    class="building-photo"
+                />
 
-        </div>
+              </div>
             </div>
             <h3 class="card-title">{{ ticket.title }}</h3>
           </div>
@@ -46,24 +46,26 @@
       </div>
     </div>
 
-    <!-- Formulaire modal pour créer un ticket -->
+    <!-- Création ticket -->
     <FormModal
-      :visible="formVisible"
-      :title="formTitle"
-      :fields="formFields"
-      :initialData="formInitialData"
-      @submit="handleFormSubmit"
-      @cancel="closeForm"
+        :visible="formVisible"
+        :title="formTitle"
+        :fields="formFields"
+        :initialData="formInitialData"
+        @submit="handleFormSubmit"
+        @cancel="closeForm"
+        @building-changed="fetchEquipments"
     />
 
-    <!-- Formulaire modal pour l'attribution -->
+
+    <!--  pour l'attribution -->
     <FormModal
-      :visible="showAssignModal"
-      title="Attribuer le ticket"
-      :fields="assignmentFields"
-      :initialData="assignmentInitialData"
-      @submit="handleAssignmentSubmit"
-      @cancel="closeAssignModal"
+        :visible="showAssignModal"
+        title="Attribuer le ticket"
+        :fields="assignmentFields"
+        :initialData="assignmentInitialData"
+        @submit="handleAssignmentSubmit"
+        @cancel="closeAssignModal"
     />
   </div>
 </template>
@@ -80,10 +82,10 @@ export default {
   data() {
     return {
       columns: [
-        { status: "created", title: "Créé" },
-        { status: "open", title: "Ouvert" },
-        { status: "in_progress", title: "En cours" },
-        { status: "resolved", title: "Résolu" },
+        {status: "created", title: "Créé"},
+        {status: "open", title: "Ouvert"},
+        {status: "in_progress", title: "En cours"},
+        {status: "resolved", title: "Résolu"},
       ],
       tickets: [],
       buildings: [],
@@ -121,30 +123,45 @@ export default {
         console.error("Erreur lors de la récupération des tickets :", error);
       }
     },
-   async fetchBuildings() {
-  try {
-    const response = await axios.get("http://127.0.0.1:8000/api/building/building/");
-    console.log("Bâtiments reçus :", response.data);
-    this.buildings = response.data;
-  } catch (error) {
-    console.error("Erreur lors de la récupération des bâtiments :", error);
-  }
-},
-    getBuildingById(buildingId) {
-  return this.buildings.find(building => building.id === buildingId) || null;
-},
-
-    async fetchEquipments() {
+    async fetchBuildings() {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/building/equipment/");
+        const response = await axios.get("http://127.0.0.1:8000/api/building/building/");
+        console.log("Bâtiments reçus :", response.data);
+        this.buildings = response.data;
+      } catch (error) {
+        console.error("Erreur lors de la récupération des bâtiments :", error);
+      }
+    },
+    getBuildingById(buildingId) {
+      return this.buildings.find(building => building.id === buildingId) || null;
+    },
+
+    async fetchEquipments(buildingId) {
+      if (!buildingId) {
+        this.equipments = [];
+        this.formFields.equipment.options = [];
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://127.0.0.1:8000/api/building/equipment/`, {
+          params: {building_id: buildingId},
+        });
         this.equipments = response.data;
+
+        this.formFields.equipment.options = this.equipments.map(e => ({
+          value: e.id,
+          label: e.name,
+        }));
       } catch (error) {
         console.error("Erreur lors de la récupération des équipements :", error);
       }
     },
+
+
     async fetchUsers() {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/user/users/");
+        const response = await axios.get("http://127.0.0.1:8000/api/user/users/?profession_type=technician");
         this.users = response.data;
 
         this.assignmentFields.assigned_to.options = this.users.map(user => ({
@@ -159,16 +176,16 @@ export default {
     addTicket() {
       this.formTitle = "Créer un ticket";
       this.formFields = {
-        title: { label: "Titre", type: "text", placeholder: "Titre du ticket", required: true },
-        description: { label: "Description", type: "textarea", placeholder: "Description", required: true },
+        title: {label: "Titre", type: "text", placeholder: "Titre du ticket", required: true},
+        description: {label: "Description", type: "textarea", placeholder: "Description", required: true},
         priority: {
           label: "Priorité",
           type: "select",
           placeholder: "Priorité",
           options: [
-            { value: "low", label: "Faible" },
-            { value: "medium", label: "Moyenne" },
-            { value: "high", label: "Élevée" },
+            {value: "low", label: "Faible"},
+            {value: "medium", label: "Moyenne"},
+            {value: "high", label: "Élevée"},
           ],
           required: true,
         },
@@ -177,8 +194,8 @@ export default {
           type: "select",
           placeholder: "Type de ticket",
           options: [
-            { value: "intervention", label: "Intervention" },
-            { value: "maintenance", label: "Maintenance" },
+            {value: "intervention", label: "Intervention"},
+            {value: "maintenance", label: "Maintenance"},
           ],
           required: true,
         },
@@ -186,14 +203,19 @@ export default {
           label: "Bâtiment",
           type: "select",
           placeholder: "Sélectionner un bâtiment",
-          options: this.buildings.map(b => ({ value: b.id, label: b.name })),
+          options: this.buildings.map(b => ({value: b.id, label: b.name})),
           required: true,
+          onChange: async (event) => {
+            const buildingId = event.target.value;
+            this.formInitialData.building = buildingId; // Met à jour la valeur sélectionnée
+            await this.fetchEquipments(buildingId); // Récupère les équipements pour le bâtiment sélectionné
+          },
         },
         equipment: {
           label: "Équipement",
           type: "select",
           placeholder: "Sélectionner un équipement",
-          options: this.equipments.map(e => ({ value: e.id, label: e.name })),
+          options: this.equipments.map(e => ({value: e.id, label: e.name})),
           required: false,
         },
       };
@@ -208,19 +230,30 @@ export default {
       this.formType = "ticket";
       this.formVisible = true;
     },
+
     handleFormSubmit(formData) {
+      for (const [key, field] of Object.entries(this.formFields)) {
+        if (field.required && !formData[key]) {
+          console.error(`Le champ ${key} est requis.`);
+          alert(`Le champ "${field.label}" est requis.`);
+          return;
+        }
+      }
+
       axios
-        .post("http://127.0.0.1:8000/api/ticket/ticket/", formData)
-        .then(() => {
-          this.fetchTickets(); // Recharge les tickets après l'ajout
-          this.formVisible = false;
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la création du ticket :", error);
-        });
-    },
+          .post("http://127.0.0.1:8000/api/ticket/ticket/", formData)
+          .then(() => {
+            this.fetchTickets();
+            this.formVisible = false;
+          })
+          .catch((error) => {
+            console.error("Erreur lors de la création du ticket :", error.response.data);
+          });
+    }
+
+    ,
     handleDragStart(ticketId) {
-      this.draggedTicketId = ticketId; // Enregistre l'ID du ticket à déplacer
+      this.draggedTicketId = ticketId;
     },
     async handleDrop(event, newStatus) {
       if (!this.draggedTicketId) return;
@@ -251,8 +284,8 @@ export default {
 
       try {
         await axios.put(
-          `http://127.0.0.1:8000/api/ticket/ticket/${ticket.id}/`,
-          updatedData
+            `http://127.0.0.1:8000/api/ticket/ticket/${ticket.id}/`,
+            updatedData
         );
         await this.fetchTickets();
       } catch (error) {
@@ -271,15 +304,7 @@ export default {
     filteredTickets(status) {
 
       return this.tickets.filter((ticket) => ticket.status === status);
-    },
-  getBuildingImage(building) {
-  if (building && building.picture && !building.picture.includes('default.jpg')) {
-    return 'http://127.0.0.1:8000${building.picture}';
-  }
-  return 'http://127.0.0.1:8000/media/default.jpg';
-}
-
-
+    }
   },
   async mounted() {
     await Promise.all([
@@ -293,11 +318,12 @@ export default {
 </script>
 
 <style scoped>
-img{
+img {
   width: 30%;
   height: 30%;
   object-fit: cover;
 }
+
 .kanban-board {
   margin-top: 20px;
   display: flex;
@@ -350,7 +376,7 @@ img{
   height: 50px;
   cursor: pointer;
   position: fixed;
-  margin-top:5px;
+  margin-top: 5px;
   right: 20px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transition: background-color 0.3s ease;
