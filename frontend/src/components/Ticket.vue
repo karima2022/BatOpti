@@ -36,10 +36,11 @@
             <h3 class="card-title">{{ ticket.title }}</h3>
           </div>
           <p class="card-description">{{ ticket.description }}</p>
+            <p class="card-description">Crée par:{{ ticket.created_by.username }}</p>
           <div class="card-footer">
             <span class="assigned-to" v-if="ticket.assigned_to">
               Assigné à: {{ ticket.assigned_to.username }}
-              ({{ ticket.assigned_to.profession_type }})
+
             </span>
           </div>
         </div>
@@ -91,7 +92,11 @@ export default {
       buildings: [],
       equipments: [],
       formTitle: "",
-      formFields: {},
+      formFields: {
+        equipment: {
+        options: [], // Initialise les options pour éviter l'erreur undefined
+      },
+      },
       formInitialData: {},
       formType: "",
       formVisible: false,
@@ -114,15 +119,16 @@ export default {
     };
   },
   methods: {
-    async fetchTickets() {
-      try {
-        const response = await axios.get("http://127.0.0.1:8000/api/ticket/ticket/");
-        this.tickets = response.data;
-
-      } catch (error) {
-        console.error("Erreur lors de la récupération des tickets :", error);
-      }
-    },
+   async fetchTickets() {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/api/ticket/ticket/");
+    console.log("Tickets récupérés :", response.data);
+    this.tickets = response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des tickets :", error);
+  }
+}
+,
     async fetchBuildings() {
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/building/building/");
@@ -241,7 +247,9 @@ export default {
       }
 
       axios
-          .post("http://127.0.0.1:8000/api/ticket/ticket/", formData)
+          .post("http://127.0.0.1:8000/api/ticket/ticket/", formData,{
+
+          })
           .then(() => {
             this.fetchTickets();
             this.formVisible = false;

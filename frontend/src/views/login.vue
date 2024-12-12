@@ -2,7 +2,7 @@
   <div class="login-page">
     <div class="login-card">
       <div class="login-header">
-<!--        <img src="../assets/bat.webp" alt="Illustration du bâtiment" class="login-image" />-->
+        <!--        <img src="../assets/bat.webp" alt="Illustration du bâtiment" class="login-image" />-->
         <h2>Bienvenue sur BatOpti</h2>
         <p>Connectez-vous pour gérer vos bâtiments lol et projets</p>
       </div>
@@ -53,7 +53,12 @@ export default {
         const response = await axios.post('http://127.0.0.1:8000/api/auth/login/', {
           username: this.username,
           password: this.password,
-        });
+        },
+  {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
         localStorage.setItem('access', response.data.access);
         localStorage.setItem('refresh', response.data.refresh);
         this.$router.push('/dashboard');
@@ -64,6 +69,8 @@ export default {
   },
 };
 </script>
+
+
 <style scoped lang="scss">
 .login-page {
   display: flex;
