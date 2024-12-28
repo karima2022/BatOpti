@@ -285,10 +285,16 @@ export default {
     },
     async updateTicketStatus(ticket, newStatus, assignedUserId = null) {
       const updatedData = {
-        ...ticket,
+        title: ticket.title,
+        description: ticket.description,
+        priority: ticket.priority,
+        ticket_type: ticket.ticket_type,
+        building: ticket.building,
         status: newStatus,
-        assigned_to: assignedUserId,
       };
+      if (assignedUserId) {
+        updatedData.assigned_to = assignedUserId;
+      }
 
       try {
         await axios.put(
@@ -297,7 +303,8 @@ export default {
         );
         await this.fetchTickets();
       } catch (error) {
-        console.error("Erreur lors de la mise à jour du ticket:", error);
+        console.error("Erreur lors de la mise à jour du ticket:", error.response.data);
+        alert(`Erreur lors de la mise à jour du ticket: ${JSON.stringify(error.response.data)}`);
       }
     },
     closeForm() {

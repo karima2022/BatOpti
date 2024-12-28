@@ -6,6 +6,7 @@ class Building(models.Model):
         ('admin', 'Administration'),
         ('bank', 'Banque'),
         ('theater', 'Théâtre'),
+        ('cinema', 'Cinéma'),
         
     ]
 
